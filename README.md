@@ -11,5 +11,6 @@ Java and Java EE final project on Rumos Java Acadmey
 	 - Managed Beans
 	 - Servlets
 	 - JSF
+	 - PrimeFaces
 	 - Bootstrap
  - WebLogic
