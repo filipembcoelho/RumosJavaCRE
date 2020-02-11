@@ -1,0 +1,187 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+    <f:loadBundle var="bundle" basename="com.filipemcoelho.resources.bundle" />
+    <f:view locale="#{settingsController.locale}"/>
+    <ui:composition template="templates/header.xhtml">
+        <ui:define name="head">
+            <title>My Invoices</title>
+            <style type="text/css">
+                .ui-datatable-header {
+                    height: 50px;
+                    text-align: right !important;
+                }
+            </style>
+
+
+        </ui:define>
+        <ui:define name="content">
+            <div class="jumbotron">
+                <h1>#{bundle.MyInvoices}</h1>
+            </div>
+
+            <h:form id="datatable">
+                <p:dataTable id="invoices" widgetVar="invoicesTable" var="inv" 
+                             value="#{invoiceController.findAllInvoices()}"
+                             emptyMessage="No cars found with given criteria"
+                             filteredValue="#{invoiceController.filteredInvoices}"
+                             rows="10" paginator="true" 
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+
+                    <f:facet name="header">
+                        <p:outputPanel>
+                            <h:outputText value="Search all fields:" />
+                            <p:inputText id="globalFilter" onkeyup="PF('invoicesTable').filter()" style="width:150px" placeholder="Enter keyword"/>
+
+                            <!--Column Toggler-->
+                            <p:commandButton id="toggler" type="button" value="Columns" style="float:right" icon="pi pi-align-justify" />
+                            <p:columnToggler datasource="invoices" trigger="toggler" />
+                        </p:outputPanel>
+                    </f:facet>
+
+                    <p:column headerText="Id" filterBy="#{inv.invoiceId}" filterMatchMode="exact">
+                        <h:outputText value="#{inv.invoiceId}" />
+                    </p:column>
+
+                    <p:column headerText="Client info" filterBy="#{inv.client.firstName}" filterMatchMode="contains">
+                        <h:outputText value="#{inv.client.clientId} #{inv.client.firstName} #{inv.client.lastName}" />
+                    </p:column>
+
+                    <p:column headerText="Employee" filterBy="#{inv.person.firstName}" filterMatchMode="contains">
+                        <h:outputText value="#{inv.person.userId} #{inv.person.firstName} #{inv.person.lastName}" />
+                    </p:column>
+
+                    <p:column headerText="Date"  filterBy="#{inv.invoiceDate}" filterMatchMode="contains">
+                        <h:outputText value="#{inv.invoiceDate}" />
+                    </p:column>
+
+                    <p:column style="width:50px">
+                        <p:commandButton icon="pi pi-search" style="width: 15px; height: 15px;" onclick="PF('dlg2').show();" process="@this" update="form2" ajax="true">
+                            <f:setPropertyActionListener value="#{inv}" target="#{invoiceController.selectedInvoice}" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+
+                <div class="ui-g">
+                    <div class="ui-g-12">
+                        <p:commandButton value="New invoice" styleClass="ui-priority-primary"  onclick="PF('dlg').show();"/>
+                    </div>
+                </div>
+            </h:form>
+
+            <p:dialog id="dlg" header="New Invoice" widgetVar="dlg" modal="true" width="900">
+                <h:form id="form">
+                    <p:panel header="Invoice information" style="margin-bottom:20px">
+                        <h:panelGrid columns="3" cellspacing="30" cellpadding="5">
+
+                            <p:outputLabel for="client" value="Client:" />
+                            <p:selectOneMenu id="client" value="#{invoiceController.clientId}" required="true" requiredMessage="Client is required">
+                                <f:selectItems value="#{invoiceController.findAllClients()}" var="cl" itemValue="#{cl.clientId}" itemLabel="#{cl.clientId} #{cl.firstName} #{cl.lastName}"/>
+                            </p:selectOneMenu>
+                            <p:message for="client" />
+
+                            <p:outputLabel for="employee" value="Employee:" />
+                            <p:selectOneMenu id="employee" value="#{invoiceController.sellerId}" required="true" requiredMessage="Employee is required">
+                                <f:selectItems value="#{invoiceController.findAllEmployees()}" var="em" itemValue="#{em.userId}" itemLabel="#{em.userId} #{em.firstName} #{em.lastName}"/>
+                            </p:selectOneMenu>
+                            <p:message for="employee" />
+                        </h:panelGrid>
+                    </p:panel>
+
+
+                    <br/>
+                    <p:panel header="Invoice Lines" style="margin-bottom:20px">
+                        <p:outputLabel id="invoiceProducts">
+                            <p:dataTable id="invoiceProducts1" widgetVar="invoicesLineTable" var="invLine" value="#{invoiceController.lines}" >
+                                <p:column headerText="Product Id" style="width: 100px;">
+                                    <h:outputText value="#{invLine.product.productId}" />
+                                </p:column>
+                                <p:column headerText="Product Name / model / year">
+                                    <h:outputText value="#{invLine.product.name}  #{invLine.product.model} #{invLine.product.year}" />
+                                </p:column>
+                                <p:column headerText="Product Price" style="width: 100px;">
+                                    <h:outputText value="#{invLine.price}" />
+                                </p:column>
+                                <p:column headerText="Quantity" style="width: 100px;">
+                                    <h:outputText value="#{invLine.quantity}" />
+                                </p:column>
+                                <p:column headerText="Total" style="width: 100px;">
+                                    <h:outputText value="#{invoiceController.calculateTotal(invLine.price, invLine.quantity)}" />
+                                </p:column>
+
+                            </p:dataTable>
+                            <br/>
+                            <p:panel id="invoiceLineTable" header="Add invoice Line" style="margin-bottom:15px">
+                                <h:panelGrid columns="2" cellspacing="5">
+                                    <p:outputLabel for="productLine" value="Product:" />
+                                    <p:selectOneMenu id="productLine"  label="addProduct" value="#{invoiceController.productId}" required="true" requiredMessage="Category is required">
+                                        <f:selectItems value="#{productController.findAllProducts()}" var="em" itemValue="#{em.productId}" itemLabel="#{em.brand} #{em.model} #{em.year}"/>
+                                    </p:selectOneMenu>
+
+                                    <p:outputLabel for="qtyLine" value="Quantity" />
+                                    <p:inputText id="qtyLine" value="#{invoiceController.invoiceLine.quantity}"/>
+
+<!--                                    <p:outputLabel for="priceLine" value="Price:" />
+                                    <p:inputText id="priceLine" value="#{invoiceController.invoiceLine.product.price}" disabled="true"/>
+
+                                    <p:outputLabel for="totalLine" value="Total:" />
+                                    <p:inputText id="totalLine" value="#{invoiceController.invoiceLine.product.price}" disabled="true"/>-->
+
+                                    <p:commandButton value="Add invoice line"  icon="pi pi-check" update="invoiceProducts1" oncomplete="PF('invoicesLineTable').addRow()" action="#{invoiceController.addInvoiceLine()}"/>
+                                </h:panelGrid>
+                            </p:panel>
+                        </p:outputLabel>
+                    </p:panel>
+                    <p:commandButton value="Add Invoice"  icon="pi pi-check" action="#{invoiceController.addInvoice()}" oncomplete="PF('dlg').show();PF('invoicesTable').addRow();" update="form" />
+                </h:form>
+            </p:dialog>
+
+            <p:dialog id="dlg2" header="Check invoice" widgetVar="dlg2" modal="true" width="900">
+                <h:form id="form2">
+                    <p:panel header="Invoice information" style="margin-bottom:20px">
+                        <h:panelGrid columns="3" cellspacing="30" cellpadding="5">
+
+                            <p:outputLabel for="clientSee" value="Client:" />
+                            <p:inputText id="clientSee" value="#{invoiceController.selectedInvoice.client.firstName} #{invoiceController.selectedInvoice.client.lastName}" disabled="true"/>
+                            <p:message for="clientSee" />
+
+                            <p:outputLabel for="employeeSee" value="Employee:" />
+                            <p:inputText id="employeeSee" value="#{invoiceController.selectedInvoice.person.firstName} #{invoiceController.selectedInvoice.person.lastName}" disabled="true"/>
+                            <p:message for="employeeSee" />
+                        </h:panelGrid>
+                    </p:panel>
+
+                    <p:dataTable var="il" value="#{invoiceController.selectedInvoice.invoiceLinesList}">
+                        <p:column headerText="Id">
+                            <h:outputText value="#{il.product.productId}" />
+                        </p:column>
+
+                        <p:column headerText="Brand / Model / Year">
+                            <h:outputText value="#{il.product.brand} #{il.product.model} #{il.product.year}" />
+                        </p:column>
+
+                        <p:column headerText="Price">
+                            <h:outputText value="#{il.price}" />
+                        </p:column>
+
+                        <p:column headerText="Quantity">
+                            <h:outputText value="#{il.quantity}" />
+                        </p:column>
+
+
+                    </p:dataTable>
+                </h:form>
+            </p:dialog>
+
+
+        </ui:define>
+
+    </ui:composition>
+
+</html>

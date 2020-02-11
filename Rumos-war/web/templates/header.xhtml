@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <f:loadBundle var="bundle" basename="com.filipemcoelho.resources.bundle" />
+    <f:view locale="#{settingsController.locale}"/>
+    <h:head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+        <h:outputStylesheet library="css" name="bootstrap.css"></h:outputStylesheet>
+
+        <ui:insert name="head">
+
+
+        </ui:insert>
+    </h:head>
+    <h:body>
+        <div class="mx-auto w-75 min-vh-100 p-3 bg-light">
+            <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
+                <h:form>
+                    <h:commandLink id="nav_index" value="#{bundle.Home}" styleClass="navbar-brand" action="/index?faces-redirect=true">
+                        <f:param name="title" value="index" />
+                    </h:commandLink>
+                </h:form>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item active">
+                            <h:form>
+                                <h:commandLink id="nav_index" value="#{bundle.Home}" styleClass="nav-link" action="/index?faces-redirect=true">
+                                    <f:param name="title" value="index" />
+                                </h:commandLink>
+                            </h:form>
+                        </li>
+                        <li class="nav-item">
+                            <h:form>
+                                <h:commandLink id="nav_products" value="#{bundle.Products}" styleClass="nav-link" action="/ourproducts?faces-redirect=true">
+
+                                </h:commandLink>
+                            </h:form>
+                        </li>
+                        <li class="nav-item">
+                            <h:form>
+                                <h:commandLink id="nav_team" value="#{bundle.Team}" styleClass="nav-link" action="/ourteam?faces-redirect=true">
+                                    <f:param name="title" value="team" />
+                                </h:commandLink>
+                            </h:form>
+                        </li>
+                    </ul>
+                    <h:panelGroup layout="block" rendered="#{loginController.checkLogin()}">
+                        <div class="dropdown">
+                            <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Admin
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <h:form>
+                                    <h:commandLink id="nav_invoices" value="#{bundle.MyInvoices}" styleClass="dropdown-item" action="myinvoices?faces-redirect=true">
+                                        <f:param name="title" value="myinvoices" />
+                                    </h:commandLink>
+                                </h:form>
+                                <h:form>
+                                    <h:commandLink id="nav_my_products" value="#{bundle.MyProducts}" styleClass="dropdown-item" action="myproducts?faces-redirect=true">
+                                        <f:param name="title" value="myproducts" />
+                                    </h:commandLink>
+                                </h:form>
+                                <div class="dropdown-divider"></div>
+                                <h:form>
+                                    <h:commandLink id="nav_my_products" value="#{bundle.Settings}" styleClass="dropdown-item" action="settings?faces-redirect=true">
+                                        <f:param name="title" value="settings" />
+                                    </h:commandLink>
+                                </h:form>
+
+                            </div>
+                        </div>
+                    </h:panelGroup>
+                    <h:form>
+                        <h:commandLink id="nav_login" value="#{bundle.Login}" styleClass="nav-link" action="filterlogin?faces-redirect=true" rendered="#{!loginController.checkLogin()}">
+
+                        </h:commandLink>
+                        <h:commandLink id="nav_logout" value="Logout" styleClass="nav-link" action="#{loginController.logout()}" rendered="#{loginController.checkLogin()}">
+
+                        </h:commandLink>
+                    </h:form>
+                </div>
+            </nav>
+
+            <ui:insert name="content">
+
+
+            </ui:insert>
+        </div>
+
+
+        <h:outputScript library="primefaces" name="jquery/jquery.js" target="head" />
+        <h:outputScript library="primefaces" name="jquery/jquery-plugins.js" target="head" />
+        <h:outputScript library="js" name="popper.min.js"></h:outputScript>
+        <h:outputScript library="js" name="bootstrap.js"></h:outputScript>
+    </h:body>
+</html>
+

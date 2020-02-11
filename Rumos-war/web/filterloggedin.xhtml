@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <f:loadBundle var="bundle" basename="com.filipemcoelho.resources.bundle" />
+    <f:view locale="#{settingsController.locale}"/>
+    <ui:composition template="templates/header.xhtml">
+        <ui:define name="head">
+            <title>index</title>
+
+        </ui:define>
+        <ui:define name="content">
+
+            <div class="jumbotron">
+                <h1>Welcome #{loginController.loggedInPerson.firstName} #{loginController.loggedInPerson.lastName}</h1>
+            </div>
+
+            <h:form>
+                <h:commandLink id="btn_products" value="#{bundle.MyProducts}" styleClass="btn btn-primary" action="myproducts?faces-redirect=true"></h:commandLink>
+                <h:commandLink id="btn_team" value="#{bundle.MyInvoices}" styleClass="btn btn-primary" style="margin-left: 20px;" action="myinvoices?faces-redirect=true"></h:commandLink>
+                <h:commandLink id="btn_settings" value="#{bundle.Settings}" styleClass="btn btn-primary" style="margin-left: 20px;" action="settings?faces-redirect=true"></h:commandLink>
+            </h:form>
+        </ui:define>
+
+    </ui:composition>
+
+</html>

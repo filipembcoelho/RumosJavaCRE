@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<weblogic-web-app xmlns="http://xmlns.oracle.com/weblogic/weblogic-web-app"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd http://xmlns.oracle.com/weblogic/weblogic-web-app http://xmlns.oracle.com/weblogic/weblogic-web-app/1.8/weblogic-web-app.xsd">
+    
+    <security-role-assignment>
+        <role-name>Admin</role-name>
+        <principal-name>admin</principal-name>
+    </security-role-assignment>
+    <security-role-assignment>
+        <role-name>Employee</role-name>
+        <principal-name>employee</principal-name>
+    </security-role-assignment>
+    
+    <context-root>/Rumos-war</context-root>
+</weblogic-web-app>

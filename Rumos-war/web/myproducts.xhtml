@@ -1,0 +1,178 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <f:loadBundle var="bundle" basename="com.filipemcoelho.resources.bundle" />
+    <f:view locale="#{settingsController.locale}"/>
+    <ui:composition template="templates/header.xhtml">
+        <ui:define name="head">
+            <title>index</title>
+            <style type="text/css">
+                .ui-datatable-header {
+                    height: 50px;
+                    text-align: right !important;
+                }
+
+            </style>
+        </ui:define>
+        <ui:define name="content">
+            <div class="jumbotron">
+                <h1>#{bundle.MyProducts}</h1>
+            </div>
+
+            <h:form id="datatable">
+                <p:dataTable id="products" widgetVar="productsTable" var="prod" selectionMode="single"
+                             value="#{productController.findAllProducts()}"
+                             selection="#{productController.selectedProduct}" rowKey="#{prod.productId}"
+                             emptyMessage="No data found with given criteria" filteredValue="#{productController.filteredProducts}"
+                             rows="10" paginator="true" 
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+
+                    <f:facet name="header">
+                        <p:outputPanel>
+                            <!--Search field-->
+                            <h:outputText value="Search all fields:" />
+                            <p:inputText id="globalFilter" onkeyup="PF('productsTable').filter()" style="width:150px" placeholder="Enter keyword"/>
+                            <!--Column Toggler-->
+                            <p:commandButton id="toggler" type="button" value="Columns" style="float:right" icon="pi pi-align-justify" />
+                            <p:columnToggler datasource="products" trigger="toggler" />
+                        </p:outputPanel>
+                    </f:facet>
+
+                    <p:column headerText="Id" sortBy="#{prod.productId}" filterBy="#{prod.productId}" filterMatchMode="contains" >
+                        <h:outputText value="#{prod.productId}" />
+                    </p:column>
+
+                    <p:column headerText="Category" sortBy="#{prod.categoryId.name}" filterBy="#{prod.categoryId.name}" filterMatchMode="contains">
+                        <h:outputText value="#{prod.categoryId.name}" />
+                    </p:column>
+
+                    <p:column headerText="Brand" sortBy="#{prod.brand}" filterBy="#{prod.brand}" filterMatchMode="contains">
+                        <h:outputText value="#{prod.brand}" />
+                    </p:column>
+
+                    <p:column headerText="Model" sortBy="#{prod.model}" filterBy="#{prod.model}" filterMatchMode="contains">
+                        <h:outputText value="#{prod.model}" />
+                    </p:column>
+
+                    <p:column headerText="Year" sortBy="#{prod.year}" filterBy="#{prod.year}" filterMatchMode="contains">
+                        <h:outputText value="#{prod.year}" />
+                    </p:column>
+
+                    <p:column headerText="Price" sortBy="#{prod.price}" filterBy="#{prod.price}" filterMatchMode="contains">
+                        <h:outputText value="#{prod.price}">
+                            <f:convertNumber type="currency" currencySymbol="€" />
+                        </h:outputText>
+                    </p:column>
+                    
+                    <p:column headerText="Admin" sortBy="#{prod.administratorId.userId}" filterBy="#{prod.administratorId.userId}" filterMatchMode="contains">
+                        <h:outputText value="#{prod.administratorId.userId}" />
+                    </p:column>
+
+                    <p:column headerText="Quantity" sortBy="#{prod.quantity}" >
+                        <h:outputText value="#{prod.quantity}" />
+                    </p:column>
+
+                    <p:column style="width:50px">
+                        <p:commandButton icon="pi pi-pencil" style="width: 20px; height: 20px;" onclick="PF('dlgedit').show();" process="@this" update="edit" ajax="true" rendered="#{productController.allowEditing(prod.administratorId.userId)}">
+                            <f:setPropertyActionListener value="#{prod}" target="#{productController.selectedProduct}" />
+                        </p:commandButton>
+                        <p:commandButton icon="pi pi-times" style="width: 20px; height: 20px;" action="#{productController.deleteProduct()}" update="datatable" rendered="#{productController.allowEditing(prod.administratorId.userId)}">
+                            <f:setPropertyActionListener value="#{prod}" target="#{productController.product}" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+
+                <div class="ui-g">
+                    <div class="ui-g-12">
+                        <p:commandButton value="Add new product" styleClass="ui-priority-primary"  onclick="PF('dlg').show();"/>
+                    </div>
+                </div>
+            </h:form>
+
+            <h:form id="form">
+
+                <p:dialog id="dlg" header="Add new product" widgetVar="dlg" modal="true">
+                    <h:panelGrid columns="3" cellspacing="30" cellpadding="5">
+
+                        <p:outputLabel for="addCategory" value="Category:" />
+                        <p:selectOneMenu id="addCategory"  label="addCategory" value="#{productController.categoryId}" required="true" requiredMessage="Category is required">
+                            <f:selectItems value="#{productController.findAllCategories()}" var="em" itemValue="#{em.categoryId}" itemLabel="#{em.name}"/>
+                        </p:selectOneMenu>
+                        <p:message for="addCategory" />
+
+                        <p:outputLabel for="brand" value="Brand:" />
+                        <p:inputText id="brand"  label="brand" value="#{productController.product.brand}" required="true" requiredMessage="Product brand is required"/>
+                        <p:message for="brand" />
+
+                        <p:outputLabel for="model" value="Model:" />
+                        <p:inputText id="model"  label="model" value="#{productController.product.model}" required="true" requiredMessage="Product model is required"/>
+                        <p:message for="model" />
+
+                        <p:outputLabel for="year" value="Year:" />
+                        <p:spinner id="year"  label="yea" value="#{productController.product.year}" min="1900" max="2020" required="true" requiredMessage="Product year is required"/>
+                        <p:message for="year" />
+
+                        <p:outputLabel for="price" value="Price:" />
+                        <p:inputText id="price"  label="price" value="#{productController.product.price}" />
+                        <p:message for="price" />
+
+                        <p:outputLabel for="qty" value="Quantity:" />
+                        <p:spinner id="qty"  label="quantity" value="#{productController.product.quantity}" min="0" />
+                        <p:message for="qty" />
+
+                        <p:commandButton value="Submit"  icon="pi pi-check" action="#{productController.addProduct()}" oncomplete="PF('dlg').show();PF('productsTable').addRow();" update="form" />
+
+                    </h:panelGrid>
+                </p:dialog>
+            </h:form>
+
+            <p:dialog id="dlg2" header="Edit product" widgetVar="dlgedit" modal="true">
+                <h:form id="edit">
+                    <h:panelGrid columns="3" cellspacing="30" cellpadding="5">
+
+                        <!-- Not working
+                        
+                        <p:outputLabel for="editCategory" value="Category:" />
+                        <p:selectOneMenu id="editCategory"  label="editCategory" value="#{productController.selectedProduct.categoryId}" required="true" requiredMessage="Product Category is required">
+                        <f:selectItems value="#{productController.findAllCategories()}" var="cat" itemLabel="#{cat.name}" itemValue="#{cat}" />
+                        </p:selectOneMenu>
+                        <p:message for="editCategory" />-->
+
+                        <p:outputLabel for="brand" value="Brand:" />
+                        <p:inputText id="brand"  label="brand" value="#{productController.selectedProduct.brand}" required="true" requiredMessage="Product brand is required"/>
+                        <p:message for="brand" />
+
+                        <p:outputLabel for="model" value="Model:" />
+                        <p:inputText id="model"  label="model" value="#{productController.selectedProduct.model}" required="true" requiredMessage="Product model is required"/>
+                        <p:message for="model" />
+
+                        <p:outputLabel for="year" value="Year:" />
+                        <p:spinner id="year"  label="yea" value="#{productController.selectedProduct.year}" min="1900" max="2020" required="true" requiredMessage="Product year is required"/>
+                        <p:message for="year" />
+
+                        <p:outputLabel for="price" value="Price:" />
+                        <p:inputText id="price"  label="price" value="#{productController.selectedProduct.price}" />
+                        <p:message for="price" />
+
+                        <p:outputLabel for="qty" value="Quantity:" />
+                        <p:spinner id="qty"  label="quantity" value="#{productController.selectedProduct.quantity}" min="0" />
+                        <p:message for="qty" />
+
+                        <p:commandButton value="Submit"  icon="pi pi-check" action="#{productController.editProduct()}" oncomplete="PF('dlgedit').hide();" update="datatable"/>
+
+                    </h:panelGrid>
+                </h:form>
+            </p:dialog>
+
+
+
+        </ui:define>
+
+    </ui:composition>
+
+</html>
